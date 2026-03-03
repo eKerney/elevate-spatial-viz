@@ -10,8 +10,8 @@ const Panel = (props: PanelProps) => {
     bottomRight: 'bottom-4 right-4',
     leftFull: 'top-2 left-2',
     smallLeft: 'bottom-0 left-0',
-    smallMiddle: 'bottom-0 left-128',
-    smallRight: 'bottom-0 right-20'
+    smallMiddle: 'bottom-0 left-120',
+    smallRight: 'bottom-0 right-0'
   };
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -23,8 +23,8 @@ const Panel = (props: PanelProps) => {
 
   return (
     <>
-      <div className={`fixed ${layoutPositions[position]} ${className || ''} `}>
-        <div ref={scrollRef} className="h-full overflow-y-auto">
+      <div className={`absolute ${layoutPositions[position]} ${className || ''} `}>
+        <div ref={scrollRef} className=" overflow-y-auto">
           {children}
         </div>
       </div>
