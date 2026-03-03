@@ -39,6 +39,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.14)
+      daisyui:
+        specifier: ^5.5.19
+        version: 5.5.19
       eslint:
         specifier: ^9
         version: 9.39.3(jiti@2.6.1)
@@ -1687,6 +1690,9 @@ packages:
   d3@7.9.0:
     resolution: {integrity: sha512-e1U46jVP+w7Iut8Jt8ri1YsPOvFpg46k+K8TpCb0P+zjCkjkPnV7WzfDJzMHy1LnA+wj5pLT1wjO901gLXeEhA==}
     engines: {node: '>=12'}
+
+  daisyui@5.5.19:
+    resolution: {integrity: sha512-pbFAkl1VCEh/MPCeclKL61I/MqRIFFhNU7yiXoDDRapXN4/qNCoMxeCCswyxEEhqL5eiTTfwHvucFtOE71C9sA==}
 
   damerau-levenshtein@1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
@@ -5170,6 +5176,8 @@ snapshots:
       d3-timer: 3.0.1
       d3-transition: 3.0.1(d3-selection@3.0.0)
       d3-zoom: 3.0.0
+
+  daisyui@5.5.19: {}
 
   damerau-levenshtein@1.0.8: {}
 
