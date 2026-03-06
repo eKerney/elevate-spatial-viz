@@ -14,7 +14,6 @@ async function getInstance() {
     const setupConn = await cachedInstance.connect();
     await setupConn.run('INSTALL spatial; LOAD spatial;');
     await setupConn.run('INSTALL httpfs; LOAD httpfs;');
-    // Optional for azure:// protocol: await setupConn.run('INSTALL azure; LOAD azure;');
     setupConn.closeSync();  // Explicit close for setup
   }
   return cachedInstance;
@@ -22,8 +21,8 @@ async function getInstance() {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const theme = searchParams.get('theme') || 'buildings';
-  const type = searchParams.get('type') || 'building';
+  const theme = searchParams.get('theme') || 'places';
+  const type = searchParams.get('type') || 'place';
   const minx = searchParams.get('minx') || '-85.65';
   const maxx = searchParams.get('maxx') || '-85.5';
   const miny = searchParams.get('miny') || '42.25';
@@ -36,22 +35,38 @@ export async function GET(request: Request) {
     const instance = await getInstance();
     conn = await instance.connect();  // Get a fresh connection per request (or reuse if you cache it carefully)
 
-    // ... rest of your code remains the same ...
+
+    // const sql = `
+    //   SELECT 
+    //     id,
+    //     subtype,
+    //     names.primary AS name,
+    //     bbox,
+    //     ST_AsGeoJSON(geometry) AS geojson
+    //   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=${theme}/type=${type}/*.parquet', hive_partitioning=1)
+    //   WHERE bbox.xmin > ${minx}
+    //     AND bbox.xmax < ${maxx}
+    //     AND bbox.ymin > ${miny}
+    //     AND bbox.ymax < ${maxy}
+    //   LIMIT ${limit};
+    // `;
 
     const sql = `
-  SELECT 
-    id,
-    subtype,
-    names.primary AS name,
-    bbox,
-    ST_AsGeoJSON(geometry) AS geojson
-  FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=${theme}/type=${type}/*.parquet', hive_partitioning=1)
-  WHERE bbox.xmin > ${minx}
-    AND bbox.xmax < ${maxx}
-    AND bbox.ymin > ${miny}
-    AND bbox.ymax < ${maxy}
-  LIMIT ${limit};
-`;
+      SELECT 
+        id,
+        basic_category,
+        names.primary AS name,
+        categories.primary AS detailed_category,
+        confidence,
+        bbox,
+        ST_AsGeoJSON(geometry) AS geojson  -- This is a Point: {"type":"Point","coordinates":[lon,lat]}
+      FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=places/type=place/*.parquet', hive_partitioning=1)
+      WHERE bbox.xmin > ${minx}
+        AND bbox.xmin < ${maxx}
+        AND bbox.ymin > ${miny}
+        AND bbox.ymin < ${maxy}
+      LIMIT ${limit};
+    `;
 
     // Then conn.run(sql) etc.
 
