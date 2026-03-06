@@ -3,6 +3,7 @@ import { MapViewState } from "deck.gl";
 import { DeckMap } from "./DeckMap";
 import Panel from "./components/Panel";
 import { useState } from "react";
+import PlacesExplorer from "./components/PlacesExplorer";
 
 export default function Home() {
   const INITIAL_VIEW_STATE: MapViewState = {
@@ -14,7 +15,7 @@ export default function Home() {
   };
   const [chatMessages, setChatMessages] = useState<Array<string>>([]);
   return (
-    <div className="h-screen w-screen overflow-hidden  ">
+    <div className="h-screen w-screen overflow-hidden relative  ">
       <Panel
         key='chatPanel'
         position='bottomLeft'
