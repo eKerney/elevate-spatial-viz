@@ -1,4 +1,3 @@
-// app/api/overture/route.ts
 import { NextResponse } from 'next/server';
 import { DuckDBInstance, DuckDBConnection } from '@duckdb/node-api';
 
@@ -7,21 +6,20 @@ let cachedInstance: DuckDBInstance | null = null;
 
 async function getInstance() {
   if (!cachedInstance) {
-    // Create the DuckDB instance (in-memory here)
     cachedInstance = await DuckDBInstance.create(':memory:');
 
     // Load extensions once on the instance (they apply globally)
     const setupConn = await cachedInstance.connect();
     await setupConn.run('INSTALL spatial; LOAD spatial;');
     await setupConn.run('INSTALL httpfs; LOAD httpfs;');
-    setupConn.closeSync();  // Explicit close for setup
+    setupConn.closeSync();
   }
   return cachedInstance;
 }
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const theme = searchParams.get('theme') || 'places';
+  // const theme = searchParams.get('theme') || 'places';
   const type = searchParams.get('type') || 'place';
   const minx = searchParams.get('minx') || '-85.65';
   const maxx = searchParams.get('maxx') || '-85.5';
@@ -33,24 +31,23 @@ export async function GET(request: Request) {
 
   try {
     const instance = await getInstance();
-    conn = await instance.connect();  // Get a fresh connection per request (or reuse if you cache it carefully)
-
-
+    conn = await instance.connect();
     // const sql = `
     //   SELECT 
     //     id,
-    //     subtype,
+    //     basic_category,
     //     names.primary AS name,
+    //     categories.primary AS detailed_category,
+    //     confidence,
     //     bbox,
     //     ST_AsGeoJSON(geometry) AS geojson
-    //   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=${theme}/type=${type}/*.parquet', hive_partitioning=1)
+    //   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=places/type=${type}/*.parquet', hive_partitioning=1)
     //   WHERE bbox.xmin > ${minx}
-    //     AND bbox.xmax < ${maxx}
+    //     AND bbox.xmin < ${maxx}
     //     AND bbox.ymin > ${miny}
-    //     AND bbox.ymax < ${maxy}
+    //     AND bbox.ymin < ${maxy}
     //   LIMIT ${limit};
     // `;
-
     const sql = `
       SELECT 
         id,
@@ -58,8 +55,10 @@ export async function GET(request: Request) {
         names.primary AS name,
         categories.primary AS detailed_category,
         confidence,
-        bbox,
-        ST_AsGeoJSON(geometry) AS geojson  -- This is a Point: {"type":"Point","coordinates":[lon,lat]}
+        ST_X(geometry) AS longitude,          -- Direct lon (works on GEOMETRY)
+        ST_Y(geometry) AS latitude,           -- Direct lat
+        -- bbox,                               -- optional
+        ST_AsGeoJSON(geometry) AS geojson     -- Direct on GEOMETRY
       FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=places/type=place/*.parquet', hive_partitioning=1)
       WHERE bbox.xmin > ${minx}
         AND bbox.xmin < ${maxx}
@@ -68,12 +67,7 @@ export async function GET(request: Request) {
       LIMIT ${limit};
     `;
 
-    // Then conn.run(sql) etc.
-
-    // Run the query → returns a result (reader)
     const result = await conn.run(sql);
-
-    // Fetch rows as array of objects
     const rows = await result.getRows();
 
     return NextResponse.json({ features: rows });
@@ -84,3 +78,19 @@ export async function GET(request: Request) {
     if (conn) conn.closeSync();  // Always close per-request connections
   }
 }
+
+// const sql = `
+//   SELECT
+//     id,
+//     subtype,
+//     names.primary AS name,
+//     bbox,
+//     ST_AsGeoJSON(geometry) AS geojson
+//   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=${theme}/type=${type}/*.parquet', hive_partitioning=1)
+//   WHERE bbox.xmin > ${minx}
+//     AND bbox.xmax < ${maxx}
+//     AND bbox.ymin > ${miny}
+//     AND bbox.ymax < ${maxy}
+//   LIMIT ${limit};
+// `;
+

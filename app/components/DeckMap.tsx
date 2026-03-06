@@ -6,6 +6,17 @@ export const DeckMap = ({ view_state, layers }: {
   layers: Layer[],
 }) => {
   const MAP_KEY = process.env.NEXT_PUBLIC_MAP_KEY;
+  // const getTooltip = info => {
+  //   if (!info.object) {
+  //     return null;
+  //   }
+  //   return `\
+  //   ${info.object.code} - ${info.object.icao}
+  //   ${info.object.name}
+  //   elev ${info.object.elevation} ft
+  //   TZ: ${info.object.time_zone}
+  //   ${info.object.url}`;
+  // };
 
   return (
     <DeckGL
