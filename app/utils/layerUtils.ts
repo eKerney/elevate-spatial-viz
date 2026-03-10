@@ -6,15 +6,15 @@ export const createPlacesLayer = (data: any) => {
     id: 'places-layer',
     data: data,
     getPosition: (d) => [d[5], d[6]],
-    getRadius: 10,
+    getRadius: 20,
     getLineColor: [255, 255, 255],
-    getLineWidth: 200,
+    getLineWidth: 1,
     stroked: true,
     pickable: true,
-    // getFillColor: d => [(255 - (d.elevation * .1)), (140 + (d.elevation * .001)), (d.elevation * .50)],
+    getFillColor: d => [(40 + (d[4] * 100)), (120 + (d[4] * 100)), 200 - (d[4] * 100)],
     autoHighlight: true,
     highlightColor: [0, 255, 208],
-    opacity: 0.3
+    opacity: 0.9
   })
 
   return pointLayer;

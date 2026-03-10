@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { DeckMap } from "./components/DeckMap";
 import { useOvertureData } from "./hooks/useOverturePlaces";
 import { createPlacesLayer } from "./utils/layerUtils";
+import { OvertureQueryParams } from "./types";
 
 export default function Home() {
   const INITIAL_VIEW_STATE: MapViewState = {
@@ -16,7 +17,16 @@ export default function Home() {
   };
   const [chatMessages, setChatMessages] = useState<Array<string>>([]);
   const [placesLayer, setPlacesLayer] = useState<ScatterplotLayer | null>(null);
-  const { features, loading, error, updateParams } = useOvertureData();
+  const overtureParams: OvertureQueryParams = {
+    theme: 'places',
+    type: 'place',
+    minx: '-85.60',
+    maxx: '-85.58',
+    miny: '42.28',
+    maxy: '42.30',
+    limit: '10',
+  };
+  const { features, loading, error, updateParams } = useOvertureData(overtureParams);
 
 
   useEffect(() => setPlacesLayer(createPlacesLayer(features)), [features]);

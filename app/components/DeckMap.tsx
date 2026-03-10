@@ -1,28 +1,30 @@
 import DeckGL, { Layer, MapViewState } from 'deck.gl';
+import { useMemo } from 'react';
 import { Map, FullscreenControl } from 'react-map-gl/maplibre';
 
 export const DeckMap = ({ view_state, layers }: {
   view_state: MapViewState,
   layers: Layer[],
 }) => {
+  const memoizedLayers = useMemo(() => [...layers], [layers]);
+
   const MAP_KEY = process.env.NEXT_PUBLIC_MAP_KEY;
-  // const getTooltip = info => {
-  //   if (!info.object) {
-  //     return null;
-  //   }
-  //   return `\
-  //   ${info.object.code} - ${info.object.icao}
-  //   ${info.object.name}
-  //   elev ${info.object.elevation} ft
-  //   TZ: ${info.object.time_zone}
-  //   ${info.object.url}`;
-  // };
+  const getTooltip = (info: any) => {
+    if (!info.object) {
+      return null;
+    }
+    return `\
+    ${info.object[1]}
+    ${info.object[2]}
+    ${info.object[3]}`;
+  };
 
   return (
     <DeckGL
       initialViewState={view_state}
       controller
-      layers={layers}
+      layers={[...memoizedLayers]}
+      getTooltip={getTooltip}
     >
       <Map
         style={{ width: '100vw', height: '100vh' }}
@@ -33,3 +35,4 @@ export const DeckMap = ({ view_state, layers }: {
     </DeckGL >
   )
 };
+// elev ${info.object.elevation} ft

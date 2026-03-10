@@ -1,18 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-interface OvertureQueryParams {
-  theme?: string;
-  type?: string;
-  minx: string | number;
-  maxx: string | number;
-  miny: string | number;
-  maxy: string | number;
-  limit?: string | number;
-}
-
-interface OvertureResponse {
-  features: any[];
-}
+import { OvertureQueryParams, OvertureResponse } from '../types';
 
 export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
   const [params, setParams] = useState<OvertureQueryParams>({
@@ -46,6 +33,7 @@ export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
       const res = await fetch(`/api/overture/places?${query}`);
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
+      console.log(data.features.slice(0, 5))
       setFeatures(data.features || []);
     } catch (err) {
       setError(err.message);
