@@ -1,19 +1,36 @@
 'use client';
-import { MapViewState } from "deck.gl";
-import { DeckMap } from "./DeckMap";
+import { MapViewState, ScatterplotLayer } from "deck.gl";
 import Panel from "./components/Panel";
-import { useState } from "react";
-import PlacesExplorer from "./components/PlacesExplorer";
+import { useEffect, useState } from "react";
+import { DeckMap } from "./components/DeckMap";
+import { useOvertureData } from "./hooks/useOverturePlaces";
+import { createPlacesLayer } from "./utils/layerUtils";
+import { OvertureQueryParams } from "./types";
 
 export default function Home() {
   const INITIAL_VIEW_STATE: MapViewState = {
-    longitude: -110,
-    latitude: 37.7853,
-    zoom: 3.8,
-    pitch: 50,
+    longitude: -85.55,
+    latitude: 42.30,
+    zoom: 12,
+    pitch: 30,
     bearing: 0,
   };
   const [chatMessages, setChatMessages] = useState<Array<string>>([]);
+  const [placesLayer, setPlacesLayer] = useState<ScatterplotLayer | null>(null);
+  const overtureParams: OvertureQueryParams = {
+    theme: 'places',
+    type: 'place',
+    minx: '-85.60',
+    maxx: '-85.58',
+    miny: '42.28',
+    maxy: '42.30',
+    limit: '10',
+  };
+  const { features, loading, error, updateParams } = useOvertureData(overtureParams);
+
+
+  useEffect(() => setPlacesLayer(createPlacesLayer(features)), [features]);
+
   return (
     <div className="h-screen w-screen overflow-hidden relative  ">
       <Panel
@@ -33,6 +50,7 @@ export default function Home() {
           messages={chatMessages}
         >
           Where is the Focal Geography?
+          {loading && 'Loading places...'}
         </Panel>
         <Panel
           key='smallMiddle'
@@ -57,7 +75,7 @@ export default function Home() {
       </Panel>
       <DeckMap
         view_state={INITIAL_VIEW_STATE}
-        layers={[]}
+        layers={[placesLayer]}
       />
     </div>
   );
