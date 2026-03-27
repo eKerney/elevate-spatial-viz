@@ -16,7 +16,7 @@ export default function Home() {
     bearing: 0,
   };
   const [chatMessages, setChatMessages] = useState<Array<string>>([]);
-  const [placesLayer, setPlacesLayer] = useState<Layer>({} as Layer);
+  const [placesLayer, setPlacesLayer] = useState<Layer | null>();
   const overtureParams: OvertureQueryParams = {
     theme: 'places',
     type: 'place',
