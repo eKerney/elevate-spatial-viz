@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@duckdb/node-api": "1.4.4-r.3",
+    "d3-fetch": "^3.0.1",
     "deck.gl": "^9.2.10",
     "maplibre-gl": "^5.19.0",
     "next": "16.1.6",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/d3-fetch": "^3.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

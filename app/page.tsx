@@ -1,5 +1,5 @@
 'use client';
-import { MapViewState, ScatterplotLayer } from "deck.gl";
+import { Layer, MapViewState, ScatterplotLayer } from "deck.gl";
 import Panel from "./components/Panel";
 import { useEffect, useState } from "react";
 import { DeckMap } from "./components/DeckMap";
@@ -16,7 +16,7 @@ export default function Home() {
     bearing: 0,
   };
   const [chatMessages, setChatMessages] = useState<Array<string>>([]);
-  const [placesLayer, setPlacesLayer] = useState<ScatterplotLayer | null>(null);
+  const [placesLayer, setPlacesLayer] = useState<Layer>({} as Layer);
   const overtureParams: OvertureQueryParams = {
     theme: 'places',
     type: 'place',

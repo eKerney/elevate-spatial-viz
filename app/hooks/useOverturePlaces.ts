@@ -31,6 +31,7 @@ export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
 
     try {
       const res = await fetch(`/api/overture/places?${query}`);
+      const res2 = await fetch(`/api/overture/places-categories`);
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
       console.log(data.features.slice(0, 5))

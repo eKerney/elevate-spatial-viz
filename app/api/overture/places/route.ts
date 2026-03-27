@@ -32,22 +32,6 @@ export async function GET(request: Request) {
   try {
     const instance = await getInstance();
     conn = await instance.connect();
-    // const sql = `
-    //   SELECT 
-    //     id,
-    //     basic_category,
-    //     names.primary AS name,
-    //     categories.primary AS detailed_category,
-    //     confidence,
-    //     bbox,
-    //     ST_AsGeoJSON(geometry) AS geojson
-    //   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=places/type=${type}/*.parquet', hive_partitioning=1)
-    //   WHERE bbox.xmin > ${minx}
-    //     AND bbox.xmin < ${maxx}
-    //     AND bbox.ymin > ${miny}
-    //     AND bbox.ymin < ${maxy}
-    //   LIMIT ${limit};
-    // `;
     const sql = `
       SELECT 
         id,
@@ -78,19 +62,4 @@ export async function GET(request: Request) {
     if (conn) conn.closeSync();  // Always close per-request connections
   }
 }
-
-// const sql = `
-//   SELECT
-//     id,
-//     subtype,
-//     names.primary AS name,
-//     bbox,
-//     ST_AsGeoJSON(geometry) AS geojson
-//   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=${theme}/type=${type}/*.parquet', hive_partitioning=1)
-//   WHERE bbox.xmin > ${minx}
-//     AND bbox.xmax < ${maxx}
-//     AND bbox.ymin > ${miny}
-//     AND bbox.ymax < ${maxy}
-//   LIMIT ${limit};
-// `;
 
