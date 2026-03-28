@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { OvertureQueryParams, OvertureResponse } from '../types';
+import { OverturePlaces, OvertureQueryParams, OvertureResponse } from '../types';
 
 export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
   const [params, setParams] = useState<OvertureQueryParams>({
@@ -13,7 +13,7 @@ export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
     ...initialParams,
   });
 
-  const [features, setFeatures] = useState<OvertureResponse | null>(null);
+  const [features, setFeatures] = useState<OverturePlaces[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
