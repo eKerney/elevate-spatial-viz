@@ -1,14 +1,15 @@
 import { configureStore, combineReducers, createListenerMiddleware } from '@reduxjs/toolkit';
 import { textureSlice } from './slices/textureSlice';
+import { overtureSlice } from './slices/overtureSlice';
 
 const listenerMiddleware = createListenerMiddleware();
 // listenerMiddleware.startListening(selectAOIListener);
 
 const rootReducer = combineReducers({
-  textureSlice
+  textureSlice: textureSlice.reducer,
+  overtureSlice: overtureSlice.reducer,
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
 
 const store = configureStore({
   reducer: rootReducer,
@@ -17,4 +18,5 @@ const store = configureStore({
 });
 
 export default store;
+export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -12,7 +12,7 @@ interface Texture {
 const initialState: Texture = {
   cardo: { bbox: { minx: 0, maxx: 0, miny: 0, maxy: 0 }, centerPoint: [0, 0], placeName: '' },
   traits: { theme: 'places', type: 'place', categoryCode: '', overtureTaxonomy: '' },
-  tempus: { startDate: new Date(), endDate: new Date() }
+  tempus: { startDate: new Date().toString(), endDate: new Date().toString() }
 }
 
 

@@ -83,6 +83,6 @@ export type Traits = {
 }
 
 export type Tempus = {
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
 }

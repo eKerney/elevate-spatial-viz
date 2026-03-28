@@ -3,9 +3,12 @@ import { Layer, MapViewState, ScatterplotLayer } from "deck.gl";
 import Panel from "./components/Panel";
 import { useEffect, useState } from "react";
 import { DeckMap } from "./components/DeckMap";
-import { useOvertureData } from "./hooks/useOverturePlaces";
+import { useOvertureData } from "./hooks/useOvertureData";
 import { createPlacesLayer } from "./utils/layerUtils";
 import { OvertureQueryParams } from "./types";
+import { useOvertureCategories } from "./hooks/useOvertureCategories";
+import { selectOverture, setData } from "./store/slices/overtureSlice";
+import { useDispatch } from "react-redux";
 
 export default function Home() {
   const INITIAL_VIEW_STATE: MapViewState = {
@@ -27,8 +30,11 @@ export default function Home() {
     limit: '10',
   };
   const { features, loading, error, updateParams } = useOvertureData(overtureParams);
-
-
+  // run once on init
+  const { data, loadingCat, errorCat } = useOvertureCategories();
+  const dispatch = useDispatch();
+  // dispatch(setData({ key: 'selectedMaskingLayers', value: layers }));
+  // useEffect(() => dispatch(setData({ key: 'overtureCategories', value: data })), [data]);
   useEffect(() => setPlacesLayer(createPlacesLayer(features)), [features]);
 
   return (

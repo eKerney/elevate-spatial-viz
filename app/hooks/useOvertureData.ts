@@ -31,15 +31,12 @@ export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
 
     try {
       const res = await fetch(`/api/overture/places?${query}`);
-      const res2 = await fetch(`/api/overture/places-categories`);
-      // if (!res.ok) throw new Error('Fetch failed');
-      const data = await res.json();
-      const data2 = await res2.json();
-      console.log(data.features.slice(0, 5))
-      console.log(data2.slice(0, 5))
-      setFeatures(data.features || []);
-    } catch (err) {
-      setError(err.message);
+      if (!res.ok) throw new Error('Fetch failed');
+      const resJSON = await res.json();
+      console.log(resJSON.features.slice(0, 5))
+      setFeatures(resJSON.features || []);
+    } catch (err: any) {
+      setError(err?.message);
     } finally {
       setLoading(false);
     }
