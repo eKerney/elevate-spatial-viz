@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { OvertureQueryParams, OvertureResponse } from '../types';
+import { OverturePlaces, OvertureQueryParams, OvertureResponse } from '../types';
 
 export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
   const [params, setParams] = useState<OvertureQueryParams>({
@@ -13,7 +13,7 @@ export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
     ...initialParams,
   });
 
-  const [features, setFeatures] = useState<OvertureResponse | null>(null);
+  const [features, setFeatures] = useState<OverturePlaces[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -32,11 +32,11 @@ export function useOvertureData(initialParams?: Partial<OvertureQueryParams>) {
     try {
       const res = await fetch(`/api/overture/places?${query}`);
       if (!res.ok) throw new Error('Fetch failed');
-      const data = await res.json();
-      console.log(data.features.slice(0, 5))
-      setFeatures(data.features || []);
-    } catch (err) {
-      setError(err.message);
+      const resJSON = await res.json();
+      console.log(resJSON.features.slice(0, 5))
+      setFeatures(resJSON.features || []);
+    } catch (err: any) {
+      setError(err?.message);
     } finally {
       setLoading(false);
     }

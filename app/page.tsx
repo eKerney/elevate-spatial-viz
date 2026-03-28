@@ -1,11 +1,15 @@
 'use client';
-import { MapViewState, ScatterplotLayer } from "deck.gl";
+import { Layer, MapViewState, } from "deck.gl";
 import Panel from "./components/Panel";
 import { useEffect, useState } from "react";
 import { DeckMap } from "./components/DeckMap";
-import { useOvertureData } from "./hooks/useOverturePlaces";
+import { useOvertureData } from "./hooks/useOvertureData";
 import { createPlacesLayer } from "./utils/layerUtils";
 import { OvertureQueryParams } from "./types";
+import { useOvertureCategories } from "./hooks/useOvertureCategories";
+import { overtureSlice, selectOverture, setData } from "./store/slices/overtureSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { GenericSelect } from "./components/GenericSelect";
 
 export default function Home() {
   const INITIAL_VIEW_STATE: MapViewState = {
@@ -16,7 +20,7 @@ export default function Home() {
     bearing: 0,
   };
   const [chatMessages, setChatMessages] = useState<Array<string>>([]);
-  const [placesLayer, setPlacesLayer] = useState<ScatterplotLayer | null>(null);
+  const [placesLayer, setPlacesLayer] = useState<Layer | null>();
   const overtureParams: OvertureQueryParams = {
     theme: 'places',
     type: 'place',
@@ -26,10 +30,14 @@ export default function Home() {
     maxy: '42.30',
     limit: '10',
   };
-  const { features, loading, error, updateParams } = useOvertureData(overtureParams);
+  const { features, loading, error } = useOvertureData(overtureParams);
+  // run once on init
+  const { data } = useOvertureCategories();
 
-
+  const dispatch = useDispatch();
+  useEffect(() => { dispatch(setData({ key: 'overtureCategories', value: data })) }, [data]);
   useEffect(() => setPlacesLayer(createPlacesLayer(features)), [features]);
+  const overtureCategories = useSelector(selectOverture('overtureCategories'));
 
   return (
     <div className="h-screen w-screen overflow-hidden relative  ">
@@ -51,6 +59,7 @@ export default function Home() {
         >
           Where is the Focal Geography?
           {loading && 'Loading places...'}
+          {error && 'Places Loading Error'}
         </Panel>
         <Panel
           key='smallMiddle'
@@ -61,6 +70,13 @@ export default function Home() {
           messages={chatMessages}
         >
           Which Criteria are of Interest?
+          <GenericSelect
+            choices={overtureCategories.map(d => d.categoryCode)}
+            title=""
+            defaultChoice={'Overture Category'}
+            callback={() => null}
+            value=""
+          />
         </Panel>
         <Panel
           key='smallRight'

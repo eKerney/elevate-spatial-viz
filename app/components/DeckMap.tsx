@@ -1,6 +1,7 @@
 import DeckGL, { Layer, MapViewState } from 'deck.gl';
 import { useMemo } from 'react';
 import { Map, FullscreenControl } from 'react-map-gl/maplibre';
+import { OverturePlaces } from '../types';
 
 export const DeckMap = ({ view_state, layers }: {
   view_state: MapViewState,
@@ -9,14 +10,15 @@ export const DeckMap = ({ view_state, layers }: {
   const memoizedLayers = useMemo(() => [...layers], [layers]);
 
   const MAP_KEY = process.env.NEXT_PUBLIC_MAP_KEY;
-  const getTooltip = (info: any) => {
-    if (!info.object) {
+  const getTooltip = ({ object }: { object: OverturePlaces }) => {
+    if (!object) {
       return null;
     }
     return `\
-    ${info.object[1]}
-    ${info.object[2]}
-    ${info.object[3]}`;
+    ${object['placeName']}
+    ${object['categoryCode']}
+    ${object['placeID']}
+    `;
   };
 
   return (

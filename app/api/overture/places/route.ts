@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { DuckDBInstance, DuckDBConnection } from '@duckdb/node-api';
+import { DuckDBInstance, DuckDBConnection, DuckDBValue } from '@duckdb/node-api';
+import { OverturePlaces } from '@/app/types';
+import { parse } from 'path/win32';
 
 // Cache the instance (recommended — create once, reuse connections)
 let cachedInstance: DuckDBInstance | null = null;
@@ -32,22 +34,6 @@ export async function GET(request: Request) {
   try {
     const instance = await getInstance();
     conn = await instance.connect();
-    // const sql = `
-    //   SELECT 
-    //     id,
-    //     basic_category,
-    //     names.primary AS name,
-    //     categories.primary AS detailed_category,
-    //     confidence,
-    //     bbox,
-    //     ST_AsGeoJSON(geometry) AS geojson
-    //   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=places/type=${type}/*.parquet', hive_partitioning=1)
-    //   WHERE bbox.xmin > ${minx}
-    //     AND bbox.xmin < ${maxx}
-    //     AND bbox.ymin > ${miny}
-    //     AND bbox.ymin < ${maxy}
-    //   LIMIT ${limit};
-    // `;
     const sql = `
       SELECT 
         id,
@@ -69,28 +55,25 @@ export async function GET(request: Request) {
 
     const result = await conn.run(sql);
     const rows = await result.getRows();
+    const parsedData: Array<OverturePlaces> = rows.map((d) => {
+      return {
+        placeID: String(d[0]),
+        categoryCode: String(d[1]),
+        placeName: String(d[2]),
+        taxonomy: String(d[3]),
+        certainty: Number(d[4]),
+        longitude: Number(d[5]),
+        latitude: Number(d[6]),
+        geoJSONgeometryString: String(d[7]),
+      }
+    })
 
-    return NextResponse.json({ features: rows });
+    return NextResponse.json({ features: parsedData });
   } catch (err: any) {
     console.error('DuckDB error:', err);
     return NextResponse.json({ error: err.message || 'Query failed' }, { status: 500 });
   } finally {
-    if (conn) conn.closeSync();  // Always close per-request connections
+    if (conn) conn.closeSync();
   }
 }
-
-// const sql = `
-//   SELECT
-//     id,
-//     subtype,
-//     names.primary AS name,
-//     bbox,
-//     ST_AsGeoJSON(geometry) AS geojson
-//   FROM read_parquet('s3://overturemaps-us-west-2/release/2026-02-18.0/theme=${theme}/type=${type}/*.parquet', hive_partitioning=1)
-//   WHERE bbox.xmin > ${minx}
-//     AND bbox.xmax < ${maxx}
-//     AND bbox.ymin > ${miny}
-//     AND bbox.ymax < ${maxy}
-//   LIMIT ${limit};
-// `;
 
