@@ -4,22 +4,31 @@ import Panel from "./components/Panel";
 import { useEffect, useState } from "react";
 import { DeckMap } from "./components/DeckMap";
 import { useOvertureData } from "./hooks/useOvertureData";
-import { createPlacesLayer } from "./utils/layerUtils";
+import { createPlacesLayer, createTileLayer3D } from "./utils/layerUtils";
 import { OvertureQueryParams } from "./types";
 import { useOvertureCategories } from "./hooks/useOvertureCategories";
-import { overtureSlice, selectOverture, setData } from "./store/slices/overtureSlice";
+import { selectOverture, setData } from "./store/slices/overtureSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { GenericSelect } from "./components/GenericSelect";
 
 export default function Home() {
   const INITIAL_VIEW_STATE: MapViewState = {
-    longitude: -85.55,
-    latitude: 42.30,
-    zoom: 12,
-    pitch: 30,
-    bearing: 0,
-  };
-  const [chatMessages, setChatMessages] = useState<Array<string>>([]);
+    longitude: 144.96,
+    latitude: -37.81,
+    zoom: 16,
+    pitch: 45,
+    bearing: 0
+  }
+
+  // const INITIAL_VIEW_STATE: MapViewState = {
+  //   longitude: -85.55,
+  //   latitude: 42.30,
+  //   zoom: 12,
+  //   pitch: 30,
+  //   bearing: 0,
+  // };
+  const [initialViewState, setInitialViewState] = useState<MapViewState>(INITIAL_VIEW_STATE);
+  const [chatMessages, _setChatMessages] = useState<Array<string>>([]);
   const [placesLayer, setPlacesLayer] = useState<Layer | null>();
   const overtureParams: OvertureQueryParams = {
     theme: 'places',
@@ -38,6 +47,10 @@ export default function Home() {
   useEffect(() => { dispatch(setData({ key: 'overtureCategories', value: data })) }, [data]);
   useEffect(() => setPlacesLayer(createPlacesLayer(features)), [features]);
   const overtureCategories = useSelector(selectOverture('overtureCategories'));
+
+  // 3dTilesLayer testting seciton
+  const [tile3Dlayer, setTile3Dlayer] = useState<Layer | null>();
+  useEffect(() => setTile3Dlayer(createTileLayer3D(setInitialViewState)), []);
 
   return (
     <div className="h-screen w-screen overflow-hidden relative  ">
@@ -90,8 +103,8 @@ export default function Home() {
         </Panel>
       </Panel>
       <DeckMap
-        view_state={INITIAL_VIEW_STATE}
-        layers={[placesLayer]}
+        view_state={initialViewState}
+        layers={[tile3Dlayer]}
       />
     </div>
   );
