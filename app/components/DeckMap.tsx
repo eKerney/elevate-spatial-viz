@@ -37,4 +37,3 @@ export const DeckMap = ({ view_state, layers }: {
     </DeckGL >
   )
 };
-// elev ${info.object.elevation} ft
